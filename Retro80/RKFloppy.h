@@ -9,7 +9,7 @@
 
 #import "x8255.h"
 
-@interface RKFloppy : X8255 <BYTE, Enabled>
+@interface RKFloppy : X8255 <BYTE, Enabled, NSMenuItemValidation>
 
 @property(nonatomic, readonly) unsigned selected;
 @property(nonatomic, strong) NSURL *diskA;

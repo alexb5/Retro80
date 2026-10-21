@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="25098" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="25098"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -33,7 +33,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="100" y="500" width="468" height="322"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1050"/>
             <value key="minSize" type="size" width="468" height="322"/>
             <view key="contentView" id="VHf-sT-NAQ">
                 <rect key="frame" x="0.0" y="0.0" width="468" height="322"/>
@@ -50,7 +50,7 @@
                             <outlet property="digit6" destination="bV2-nW-PMC" id="laF-jW-cOZ"/>
                         </connections>
                     </customView>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ggy-Fu-duH">
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ggy-Fu-duH">
                         <rect key="frame" x="5" y="0.0" width="4" height="22"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="rJP-rM-255"/>
@@ -129,11 +129,12 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="Fbs-Up-CgJ"/>
             </connections>
+            <point key="canvasLocation" x="140" y="142"/>
         </window>
         <window title="Ретро КР580: Отладчик" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="01n-hT-pln" userLabel="Debug Panel" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES" utility="YES"/>
             <rect key="contentRect" x="167" y="107" width="783" height="522"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1050"/>
             <view key="contentView" id="qfh-TF-8L7">
                 <rect key="frame" x="0.0" y="0.0" width="783" height="522"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -141,15 +142,15 @@
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iyn-3Z-4XL">
                         <rect key="frame" x="0.0" y="0.0" width="783" height="522"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="EOO-jY-kaX">
-                            <rect key="frame" x="1" y="1" width="781" height="520"/>
+                            <rect key="frame" x="1" y="1" width="764" height="520"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <textView importsGraphics="NO" richText="NO" horizontallyResizable="YES" verticallyResizable="YES" id="FeX-Q1-ED0">
-                                    <rect key="frame" x="0.0" y="0.0" width="781" height="520"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="764" height="520"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" red="1" green="1" blue="0.78431372549019607" alpha="0.94999999999999996" colorSpace="calibratedRGB"/>
-                                    <size key="minSize" width="781" height="520"/>
+                                    <size key="minSize" width="764" height="520"/>
                                     <size key="maxSize" width="10000000" height="10000000"/>
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <connections>

@@ -9,7 +9,7 @@
 
 #import "x8255.h"
 
-@interface ROMDisk : X8255 <NSOpenSavePanelDelegate>
+@interface ROMDisk : X8255 <NSOpenSavePanelDelegate, NSMenuItemValidation>
 {
 	NSString *resource;
 

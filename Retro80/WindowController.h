@@ -11,7 +11,7 @@
 @class Sound;
 @class Debug;
 
-@interface WindowController : NSWindowController<NSWindowDelegate>
+@interface WindowController : NSWindowController<NSWindowDelegate, NSMenuItemValidation>
 
 @property(assign) Document *document;
 

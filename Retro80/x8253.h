@@ -9,7 +9,7 @@
 
 #import "Retro80.h"
 
-@interface X8253 : NSResponder <SND, RD, WR, INTE, Enabled, NSCoding>
+@interface X8253 : NSResponder <SND, RD, WR, INTE, Enabled, NSCoding, NSMenuItemValidation>
 
 @property(nonatomic) BOOL channel0;
 @property(nonatomic) BOOL channel1;

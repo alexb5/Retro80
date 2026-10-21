@@ -9,7 +9,7 @@
 
 #import "x8255.h"
 
-@interface RKKeyboard : X8255
+@interface RKKeyboard : X8255<NSMenuItemValidation>
 {
 	// Раскладка клавиатуры (64/72 кода)
 

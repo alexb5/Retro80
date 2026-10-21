@@ -18,9 +18,9 @@
 @end
 
 #ifndef GNUSTEP
-@interface Display : MTKView
+@interface Display : MTKView<NSMenuItemValidation>
 #else
-@interface Display : NSOpenGLView
+@interface Display : NSOpenGLView<NSMenuItemValidation>
 #endif
 
 @property IBOutlet Digit *digit1;

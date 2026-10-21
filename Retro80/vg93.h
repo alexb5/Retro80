@@ -10,7 +10,7 @@
 #import "Retro80.h"
 #import "x8257.h"
 
-@interface VG93 : NSResponder<RD, WR, RESET, DMA, HLDA, Enabled, NSCoding>
+@interface VG93 : NSResponder<RD, WR, RESET, DMA, HLDA, Enabled, NSCoding, NSMenuItemValidation>
 {
 	union VG93_command		// Регистр команды
 	{

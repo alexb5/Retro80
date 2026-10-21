@@ -9,7 +9,7 @@
 
 @class Computer;
 
-@interface Sound : NSResponder
+@interface Sound : NSResponder<NSMenuItemValidation>
 
 @property(nonatomic, assign) Computer *computer;
 @property IBOutlet NSTextField *textField;

@@ -9,6 +9,6 @@
 
 #import "SpecialistKeyboard.h"
 
-@interface SpecialistMXKeyboard : SpecialistKeyboard
+@interface SpecialistMXKeyboard : SpecialistKeyboard<NSMenuItemValidation>
 - (instancetype)initRAMFOS;
 @end

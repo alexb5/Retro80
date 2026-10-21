@@ -12,6 +12,31 @@
 #import "WindowController.h"
 #import "ComputerFactory.h"
 
+// Архивирование без NSSecureCoding (классы компьютеров реализуют только NSCoding)
+
+static NSData *archiveComputer(Computer *computer)
+{
+#ifdef GNUSTEP
+	return [NSKeyedArchiver archivedDataWithRootObject:computer];
+#else
+	return [NSKeyedArchiver archivedDataWithRootObject:computer requiringSecureCoding:NO error:NULL];
+#endif
+}
+
+static id unarchiveComputer(NSData *data)
+{
+#ifdef GNUSTEP
+	return [NSKeyedUnarchiver unarchiveObjectWithData:data];
+#else
+	NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:data error:NULL];
+	unarchiver.requiresSecureCoding = NO;
+	unarchiver.decodingFailurePolicy = NSDecodingFailurePolicyRaiseException;
+	id object = [unarchiver decodeObjectForKey:NSKeyedArchiveRootObjectKey];
+	[unarchiver finishDecoding];
+	return object;
+#endif
+}
+
 @implementation Document
 
 @synthesize computer;
@@ -40,9 +65,9 @@
 
 	[self.undoManager registerUndoWithTarget:self
 									selector:@selector(performUndo:)
-									  object:[NSKeyedArchiver archivedDataWithRootObject:self.computer]];
+									  object:archiveComputer(self.computer)];
 
-	computer = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+	computer = unarchiveComputer(data);
 
 	[windowController startComputer];
 }
@@ -53,7 +78,7 @@
 	{
 		[self.undoManager registerUndoWithTarget:self
 										selector:@selector(performUndo:)
-										  object:[NSKeyedArchiver archivedDataWithRootObject:self.computer]];
+										  object:archiveComputer(self.computer)];
 
 		[self.undoManager setActionName:string];
 	}
@@ -67,7 +92,7 @@
 	{
 		@synchronized(self.computer)
 		{
-			return [NSKeyedArchiver archivedDataWithRootObject:self.computer];
+			return archiveComputer(self.computer);
 		}
 	}
 
@@ -84,7 +109,7 @@
 
 		if ([typeName isEqualToString:documentController.defaultType])
 		{
-			object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+			object = unarchiveComputer(data);
 		}
 		else
 		{
