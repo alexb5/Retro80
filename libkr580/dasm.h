@@ -7,6 +7,7 @@
 
 #ifndef RETRO80_DASM_H
 #define RETRO80_DASM_H
+#include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>

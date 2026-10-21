@@ -1,10 +1,24 @@
 #ifdef __OBJC__
+
+#ifdef __cplusplus
+// В NSImage.h у GNUstep есть битовое поле template, а в Objective-C++ это ключевое слово.
+// Foundation подключается раньше: через него приходят заголовки C++, их макрос ломает
+#import <Foundation/Foundation.h>
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wkeyword-macro"
+#define template template_
+#import <AppKit/AppKit.h>
+#undef template
+#pragma clang diagnostic pop
+#endif
+
 #import <Cocoa/Cocoa.h>
 
 @protocol NSMenuItemValidation <NSMenuValidation>
 @end
 
-@interface NSLayoutConstraint(GNUstep)
+// Реализация в GNUstep-Stub.m, только если метода нет в GNUstep
+@interface NSLayoutConstraint(GNUstepCompat)
 - (void) setConstant:(CGFloat)constant;
 @end
 
