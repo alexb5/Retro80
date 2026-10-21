@@ -9,11 +9,19 @@
 
 #import "Digit.h"
 
+#ifndef GNUSTEP
+#import <MetalKit/MetalKit.h>
+#endif
+
 @protocol TextScreen
 - (unichar)unicharAtX:(unsigned)x Y:(unsigned)y;
 @end
 
+#ifndef GNUSTEP
+@interface Display : MTKView
+#else
 @interface Display : NSOpenGLView
+#endif
 
 @property IBOutlet Digit *digit1;
 @property IBOutlet Digit *digit2;

@@ -58,6 +58,8 @@
 		D974FCAA19ADE9450041DF91 /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = D974FCA819ADE9450041DF91 /* Document.xib */; };
 		D974FCAD19ADE9450041DF91 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = D974FCAB19ADE9450041DF91 /* MainMenu.xib */; };
 		D974FCCC19ADEA080041DF91 /* Display.m in Sources */ = {isa = PBXBuildFile; fileRef = D974FCCB19ADEA080041DF91 /* Display.m */; };
+		E53FF0EA950AD281FA86F416 /* DisplayMetal.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D437FB1F227316EFA7AB0DA /* DisplayMetal.m */; };
+		768BC6DE1B5F6CA30172F81F /* DisplayGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 76C5DB81A167E90D04C7183B /* DisplayGL.m */; };
 		D974FCCF19ADEBF00041DF91 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D974FCCE19ADEBF00041DF91 /* WindowController.m */; };
 		D974FCDF19ADFD460041DF91 /* RK86Base.m in Sources */ = {isa = PBXBuildFile; fileRef = D974FCDE19ADFD460041DF91 /* RK86Base.m */; };
 		D974FCE219AE08190041DF91 /* Microsha.m in Sources */ = {isa = PBXBuildFile; fileRef = D974FCE119AE08190041DF91 /* Microsha.m */; };
@@ -217,6 +219,9 @@
 		D974FCA619ADE9450041DF91 /* Document.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Document.m; sourceTree = "<group>"; };
 		D974FCCA19ADEA080041DF91 /* Display.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Display.h; sourceTree = "<group>"; };
 		D974FCCB19ADEA080041DF91 /* Display.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Display.m; sourceTree = "<group>"; };
+		5D437FB1F227316EFA7AB0DA /* DisplayMetal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayMetal.m; sourceTree = "<group>"; };
+		76C5DB81A167E90D04C7183B /* DisplayGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayGL.m; sourceTree = "<group>"; };
+		87FBB766DD1246D97623765F /* DisplayRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayRenderer.h; sourceTree = "<group>"; };
 		D974FCCE19ADEBF00041DF91 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowController.m; sourceTree = "<group>"; };
 		D974FCD419ADF2310041DF91 /* DocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DocumentController.m; sourceTree = "<group>"; };
 		D974FCDD19ADFD460041DF91 /* RK86Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RK86Base.h; sourceTree = "<group>"; };
@@ -549,6 +554,9 @@
 				36A9CA307A3388FC7E8D5E50 /* Computer.m */,
 				D974FCCA19ADEA080041DF91 /* Display.h */,
 				D974FCCB19ADEA080041DF91 /* Display.m */,
+				5D437FB1F227316EFA7AB0DA /* DisplayMetal.m */,
+				76C5DB81A167E90D04C7183B /* DisplayGL.m */,
+				87FBB766DD1246D97623765F /* DisplayRenderer.h */,
 				D974E81B1E730002004CC92E /* Digit.h */,
 				D974E81C1E730002004CC92E /* Digit.m */,
 				D97AD7D01CE925D300015D1C /* tvnoise.vs */,
@@ -827,6 +835,8 @@
 				D92701851B073E1D00CC51BD /* Orion128.m in Sources */,
 				D974FCEA19AE10500041DF91 /* Apogeo.m in Sources */,
 				D974FCCC19ADEA080041DF91 /* Display.m in Sources */,
+				E53FF0EA950AD281FA86F416 /* DisplayMetal.m in Sources */,
+				768BC6DE1B5F6CA30172F81F /* DisplayGL.m in Sources */,
 				D9728AC41DAAC60C00D52694 /* UT88System.m in Sources */,
 				D915D6C41DBDDD640098AA98 /* MicroshaKeyboard.m in Sources */,
 				36A9CA557FE8877B01CD4181 /* Specialist.m in Sources */,

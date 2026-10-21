@@ -85,6 +85,8 @@ set(RETRO80_BASE_SOURCES
 		Retro80/Computer.m
 		Retro80/Display.h
 		Retro80/Display.m
+		Retro80/DisplayRenderer.h
+		Retro80/DisplayGL.m
 		Retro80/Digit.h
 		Retro80/Digit.m
 		Retro80/Debug.h
@@ -94,6 +96,7 @@ set(RETRO80_BASE_SOURCES
 if(APPLE)
 	set(RETRO80_BASE_SOURCES
 			${RETRO80_BASE_SOURCES}
+			Retro80/DisplayMetal.m
 			Retro80/Sound.m)
 else()
 	set(RETRO80_BASE_SOURCES

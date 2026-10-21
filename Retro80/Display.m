@@ -7,15 +7,8 @@
 
 *****/
 
-#ifndef GNUSTEP
-#import <OpenGL/gl.h>
-#else
-#define GL_GLEXT_PROTOTYPES
-#import <GL/gl.h>
-#import <GL/glext.h>
-#endif
-
 #import "Display.h"
+#import "DisplayRenderer.h"
 
 #import "WindowController.h"
 
@@ -42,7 +35,7 @@
 	BOOL grayscale;
 	BOOL tvnoise;
 
-	GLuint shaderProgram;
+	id<DisplayRenderer> renderer;
 }
 
 - (uint32_t *)setupGraphicsWidth:(NSUInteger)width height:(NSUInteger)height
@@ -135,204 +128,44 @@
 {
 	@synchronized(self)
 	{
-#ifndef GNUSTEP
-		NSRect backingBounds = [self convertRectToBacking:[self bounds]];
-#else
-		NSRect backingBounds = [self bounds];
-#endif
-		glViewport(0, 0, backingBounds.size.width, backingBounds.size.height);
+		DisplayFrame frame = {0};
+
+		frame.resolution = graphics;
+		frame.grayscale = grayscale;
+		frame.tvnoise = tvnoise;
 
 		if (((mode & 1) == 0 || data1) && ((mode & 2) == 0 || data2))
 		{
-			if (grayscale && !(tvnoise && shaderProgram))
+			if (mode == 2)
 			{
-				glMatrixMode(GL_COLOR);
-				glPushMatrix();
-
-				static float mat[] = {
-					0.30, 0.30, 0.30, 0.00,
-					0.59, 0.59, 0.58, 0.00,
-					0.11, 0.11, 0.11, 0.00,
-					0.00, 0.00, 0.00, 1.00
-				};
-
-				glLoadMatrixf(mat);
-
-				glMatrixMode(GL_MODELVIEW);
+				frame.base = data2.bytes;
+				frame.baseSize = overlay;
 			}
-
-			glEnable(GL_TEXTURE_2D);
-
-			GLuint tex[2];
-			glGenTextures(2, tex);
-
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, tex[0]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, tvnoise ? GL_LINEAR : GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, tvnoise ? GL_LINEAR : GL_NEAREST);
-
-			if (mode != 2)
-			{
-				glTexImage2D(GL_TEXTURE_2D,
-							 0,
-							 GL_RGBA,
-							 (GLsizei) graphics.width,
-							 (GLsizei) graphics.height,
-							 0,
-							 GL_RGBA,
-							 GL_UNSIGNED_BYTE,
-							 data1.bytes);
-			}
-
-			if (mode == 3)
-			{
-				glBindTexture(GL_TEXTURE_2D, tex[1]);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, tvnoise ? GL_LINEAR : GL_NEAREST);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, tvnoise ? GL_LINEAR : GL_NEAREST);
-			}
-
-			if (mode != 1)
-			{
-				glTexImage2D(GL_TEXTURE_2D,
-							 0,
-							 GL_RGBA,
-							 (GLsizei) overlay.width,
-							 (GLsizei) overlay.height,
-							 0,
-							 GL_RGBA,
-							 GL_UNSIGNED_BYTE,
-							 data2.bytes);
-			}
-
-			if (grayscale && !(tvnoise && shaderProgram))
-			{
-				glMatrixMode(GL_COLOR);
-				glPopMatrix();
-
-				glMatrixMode(GL_MODELVIEW);
-			}
-
-			if (tvnoise && shaderProgram)
-			{
-				glUseProgram(shaderProgram);
-
-				GLint location;
-
-				if ((location = glGetUniformLocation(shaderProgram, "time")) != -1)
-					glUniform1f(location, (float) [[NSProcessInfo processInfo] systemUptime]);
-
-				if ((location = glGetUniformLocation(shaderProgram, "resolution")) != -1)
-					glUniform2f(location, graphics.width, graphics.height);
-
-				if ((location = glGetUniformLocation(shaderProgram, "grayscale")) != -1)
-					glUniform1i(location, grayscale);
-
-				if ((location = glGetUniformLocation(shaderProgram, "tex0")) != -1)
-				{
-					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(GL_TEXTURE_2D, tex[0]);
-					glUniform1i(location, 0);
-				}
-
-				if ((location = glGetUniformLocation(shaderProgram, "blend")) != -1)
-					glUniform1i(location, mode == 3);
-
-				if (mode == 3 && (location = glGetUniformLocation(shaderProgram, "tex1")) != -1)
-				{
-					glActiveTexture(GL_TEXTURE1);
-					glBindTexture(GL_TEXTURE_2D, tex[1]);
-					glUniform1i(location, 1);
-				}
-
-				glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex2f(-1.0,  1.0);
-				glTexCoord2f(1.0, 0.0); glVertex2f( 1.0,  1.0);
-				glTexCoord2f(1.0, 1.0); glVertex2f( 1.0, -1.0);
-				glTexCoord2f(0.0, 1.0); glVertex2f(-1.0, -1.0);
-				glEnd();
-
-				glUseProgram(0);
-			}
-
 			else
 			{
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, tex[0]);
-
-				glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex2f(-1.0,  1.0);
-				glTexCoord2f(1.0, 0.0);	glVertex2f( 1.0,  1.0);
-				glTexCoord2f(1.0, 1.0);	glVertex2f( 1.0, -1.0);
-				glTexCoord2f(0.0, 1.0);	glVertex2f(-1.0, -1.0);
-				glEnd();
+				frame.base = data1.bytes;
+				frame.baseSize = graphics;
 
 				if (mode == 3)
 				{
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-					glBindTexture(GL_TEXTURE_2D, tex[1]);
-
-					glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex2f(-1.0,  1.0);
-					glTexCoord2f(1.0, 0.0);	glVertex2f( 1.0,  1.0);
-					glTexCoord2f(1.0, 1.0);	glVertex2f( 1.0, -1.0);
-					glTexCoord2f(0.0, 1.0);	glVertex2f(-1.0, -1.0);
-					glEnd();
-
-					glDisable(GL_BLEND);
+					frame.top = data2.bytes;
+					frame.topSize = overlay;
 				}
 			}
-
-			glActiveTexture(0);
-
-			glBindTexture(GL_TEXTURE_2D, 0);
-			glDeleteTextures(2, tex);
-			glDisable(GL_TEXTURE_2D);
 
 			if (isSelected)
 			{
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				NSSize size = textScreen ? text : graphics;
 
-				glColor4f(1.0, 1.0, 1.0, 0.5);
-
-				glBegin(GL_QUADS);
-
-				if (textScreen)
-				{
-					glVertex2f(selected.origin.x/text.width*2 - 1, 1 - selected.origin.y/text.height*2);
-					glVertex2f((selected.origin.x + selected.size.width)/text.width*2 - 1,
-							   1 - selected.origin.y/text.height*2);
-					glVertex2f((selected.origin.x + selected.size.width)/text.width*2 - 1,
-							   1 - (selected.origin.y + selected.size.height)/text.height*2);
-					glVertex2f(selected.origin.x/text.width*2 - 1,
-							   1 - (selected.origin.y + selected.size.height)/text.height*2);
-				}
-				else
-				{
-					glVertex2f(selected.origin.x/graphics.width*2 - 1, 1 - selected.origin.y/graphics.height*2);
-					glVertex2f((selected.origin.x + selected.size.width)/graphics.width*2 - 1,
-							   1 - selected.origin.y/graphics.height*2);
-					glVertex2f((selected.origin.x + selected.size.width)/graphics.width*2 - 1,
-							   1 - (selected.origin.y + selected.size.height)/graphics.height*2);
-					glVertex2f(selected.origin.x/graphics.width*2 - 1,
-							   1 - (selected.origin.y + selected.size.height)/graphics.height*2);
-				}
-
-				glEnd();
-
-				glColor4f(1.0, 1.0, 1.0, 1.0);
-				glDisable(GL_BLEND);
+				frame.isSelected = YES;
+				frame.selection = NSMakeRect(selected.origin.x/size.width,
+											 selected.origin.y/size.height,
+											 selected.size.width/size.width,
+											 selected.size.height/size.height);
 			}
 		}
-		else
-		{
-			glClear(GL_COLOR_BUFFER_BIT);
-		}
 
-        [[self openGLContext] flushBuffer];
-		glFlush();
+		[renderer drawFrame:&frame];
 	}
 }
 
@@ -380,8 +213,8 @@
 			return YES;
 		}
 
-		menuItem.state = tvnoise && shaderProgram != 0;
-		return shaderProgram != 0;
+		menuItem.state = tvnoise && renderer.hasEffects;
+		return renderer.hasEffects;
 	}
 
 	return NO;
@@ -595,150 +428,67 @@
 				[pasteBoard declareTypes:@[NSPasteboardTypeTIFF] owner:nil];
 			}
 
-			glViewport(0, 0, graphics.width, graphics.height);
-
-			if (data1)
-			{
-				glEnable(GL_TEXTURE_2D);
-
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-				glTexImage2D(GL_TEXTURE_2D,
-							 0,
-							 GL_RGBA,
-							 (GLsizei) graphics.width,
-							 (GLsizei) graphics.height,
-							 0,
-							 GL_RGBA,
-							 GL_UNSIGNED_BYTE,
-							 data1.bytes);
-
-				glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex2f(-1.0,  1.0);
-				glTexCoord2f(1.0, 0.0); glVertex2f( 1.0,  1.0);
-				glTexCoord2f(1.0, 1.0); glVertex2f( 1.0, -1.0);
-				glTexCoord2f(0.0, 1.0); glVertex2f(-1.0, -1.0);
-				glEnd();
-
-				if (data2 && (gigaScreen || graphics.width != overlay.width || graphics.height != overlay.height))
-				{
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-					glTexImage2D(GL_TEXTURE_2D,
-								 0,
-								 GL_RGBA,
-								 (GLsizei) overlay.width,
-								 (GLsizei) overlay.height,
-								 0,
-								 GL_RGBA,
-								 GL_UNSIGNED_BYTE,
-								 data2.bytes);
-
-					glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex2f(-1.0,  1.0);
-					glTexCoord2f(1.0, 0.0); glVertex2f( 1.0,  1.0);
-					glTexCoord2f(1.0, 1.0); glVertex2f( 1.0, -1.0);
-					glTexCoord2f(0.0, 1.0); glVertex2f(-1.0, -1.0);
-					glEnd();
-
-					glDisable(GL_BLEND);
-				}
-
-				glDisable(GL_TEXTURE_2D);
-			}
-
-			selected.origin.y = graphics.height - selected.origin.y - selected.size.height;
-
-			NSInteger bytesPerRow = selected.size.width*3;
-
-			if (bytesPerRow%4)
-				bytesPerRow += 4 - bytesPerRow%4;
+			NSRect rect = NSIntersectionRect(selected, NSMakeRect(0, 0, graphics.width, graphics.height));
 
 			NSBitmapImageRep *image = [[NSBitmapImageRep alloc]
 				initWithBitmapDataPlanes:NULL
-							  pixelsWide:selected.size.width
-							  pixelsHigh:selected.size.height
+							  pixelsWide:rect.size.width
+							  pixelsHigh:rect.size.height
 						   bitsPerSample:8
 						 samplesPerPixel:3
 								hasAlpha:NO
 								isPlanar:NO
 						  colorSpaceName:NSDeviceRGBColorSpace
-							bitmapFormat:0
-							 bytesPerRow:bytesPerRow
+							 bytesPerRow:0
 							bitsPerPixel:0];
 
-			glReadPixels(selected.origin.x,
-						 selected.origin.y,
-						 selected.size.width,
-						 selected.size.height,
-						 GL_RGB,
-						 GL_UNSIGNED_BYTE,
-						 image.bitmapData);
-
-			uint8_t *ptr1 = image.bitmapData;
-			uint8_t *ptr2 = ptr1 + ((GLint) selected.size.height - 1)*bytesPerRow;
-			uint8_t buffer[bytesPerRow];
-
-			while (ptr1 < ptr2)
+			if (image && data1)
 			{
-				memcpy(buffer, ptr1, bytesPerRow);
-				memcpy(ptr1, ptr2, bytesPerRow);
-				memcpy(ptr2, buffer, bytesPerRow);
+				NSUInteger gw = graphics.width, gh = graphics.height;
+				NSUInteger ow = overlay.width, oh = overlay.height;
 
-				ptr1 += bytesPerRow;
-				ptr2 -= bytesPerRow;
+				const uint8_t *base = data1.bytes;
+				const uint8_t *top = NULL;
+
+				if (data2 && (gigaScreen || gw != ow || gh != oh))
+					top = data2.bytes;
+
+				for (NSUInteger y = 0; y < rect.size.height; y++)
+				{
+					uint8_t *dst = image.bitmapData + y*image.bytesPerRow;
+					NSUInteger gy = rect.origin.y + y;
+
+					for (NSUInteger x = 0; x < rect.size.width; x++, dst += 3)
+					{
+						NSUInteger gx = rect.origin.x + x;
+						const uint8_t *src = base + (gy*gw + gx)*4;
+
+						if (top)
+						{
+							// Верхний слой растягивается до размера нижнего по ближайшему пикселю
+							const uint8_t *src2 = top + ((gy*2 + 1)*oh/(gh*2)*ow + (gx*2 + 1)*ow/(gw*2))*4;
+							unsigned alpha = src2[3];
+
+							for (int c = 0; c < 3; c++)
+								dst[c] = (uint8_t) ((src2[c]*alpha + src[c]*(255 - alpha) + 127)/255);
+						}
+						else
+						{
+							dst[0] = src[0];
+							dst[1] = src[1];
+							dst[2] = src[2];
+						}
+					}
+				}
 			}
 
-			[pasteBoard setData:[image TIFFRepresentation]
-						forType:NSPasteboardTypeTIFF];
+			if (image)
+				[pasteBoard setData:[image TIFFRepresentation]
+							forType:NSPasteboardTypeTIFF];
 
 			isSelected = NO;
 		}
 	}
-}
-
-static GLuint createShader(GLenum shaderType)
-{
-	NSString
-		*file = [NSBundle.mainBundle pathForResource:@"tvnoise" ofType:shaderType == GL_VERTEX_SHADER ? @"vs" : @"fs"],
-		*text = [NSString stringWithContentsOfFile:file encoding:NSASCIIStringEncoding error:NULL];
-
-	const GLchar *source = (GLchar *) [text cStringUsingEncoding:NSASCIIStringEncoding];
-
-	if (source == 0)
-		return 0;
-
-	GLuint shader = glCreateShader(shaderType);
-
-	if (shader == 0)
-		return 0;
-
-	glShaderSource(shader, 1, &source, NULL);
-	glCompileShader(shader);
-
-#ifndef NDEBUG
-	GLint logLength; glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
-
-	if (logLength > 0)
-	{
-		GLchar *log = malloc((size_t) logLength);
-		glGetShaderInfoLog(shader, logLength, &logLength, log);
-		NSLog(@"Shader compilation failed:\n%s", log);
-		free(log);
-	}
-#endif
-
-	GLint status; glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-
-	if (!status)
-	{
-		glDeleteShader(shader);
-		return 0;
-	}
-
-	return shader;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -752,48 +502,19 @@ static GLuint createShader(GLenum shaderType)
 	mode = 1;
 
 #ifndef GNUSTEP
-	[self setWantsBestResolutionOpenGLSurface:YES];
-	[[self openGLContext] makeCurrentContext];
+	// Перерисовка только по setNeedsDisplay:, как у NSOpenGLView
+	self.device = MTLCreateSystemDefaultDevice();
+	self.paused = YES;
+	self.enableSetNeedsDisplay = YES;
+	self.layer.opaque = YES;
+
+	// Без пересчёта в профиль монитора, как у NSOpenGLView: палитры подобраны под это
+	self.colorspace = nil;
+
+	renderer = [[DisplayMetal alloc] initWithView:self];
+#else
+	renderer = [[DisplayGL alloc] initWithView:self];
 #endif
-
-	GLuint fragmentShader = createShader(GL_FRAGMENT_SHADER);
-
-	if (fragmentShader)
-	{
-		GLuint vertexShader = createShader(GL_VERTEX_SHADER);
-
-		if (vertexShader)
-		{
-			shaderProgram = glCreateProgram();
-			glAttachShader(shaderProgram, fragmentShader);
-			glAttachShader(shaderProgram, vertexShader);
-			glLinkProgram(shaderProgram);
-
-#ifndef NDEBUG
-			GLint logLength; glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &logLength);
-
-			if (logLength > 0)
-			{
-				GLchar *log = malloc((size_t) logLength);
-				glGetProgramInfoLog(shaderProgram, logLength, &logLength, log);
-				NSLog(@"Shader program linking failed:\n%s", log);
-				free(log);
-			}
-#endif
-
-			GLint status; glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
-
-			if (!status)
-			{
-				glDeleteProgram(shaderProgram);
-				shaderProgram = 0;
-			}
-
-			glDeleteShader(vertexShader);
-		}
-
-		glDeleteShader(fragmentShader);
-	}
 }
 
 - (void)dealloc
@@ -801,14 +522,6 @@ static GLuint createShader(GLenum shaderType)
 #ifndef NDEBUG
 	NSLog(@"%@ dealloc", NSStringFromClass(self.class));
 #endif
-
-	if (shaderProgram)
-	{
-#ifndef GNUSTEP
-		[[self openGLContext] makeCurrentContext];
-#endif
-		glDeleteProgram(shaderProgram);
-	}
 }
 
 @end
