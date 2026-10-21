@@ -65,6 +65,13 @@ set(KR580_SOURCES
 add_library(kr580 STATIC ${KR580_SOURCES})
 target_include_directories(kr580 INTERFACE libkr580)
 
+option(RETRO80_TESTS "Build libkr580 tests" ON)
+
+if(RETRO80_TESTS)
+	enable_testing()
+	add_subdirectory(tests)
+endif()
+
 
 ##
 ## Retro80 Files

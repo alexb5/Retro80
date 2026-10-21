@@ -2,7 +2,8 @@
 # Пакеты GNUstep в Debian собраны под рантайм GCC, поэтому всё собирается из исходников.
 #
 #   docker build -t retro80-gnustep docker/gnustep
-#   docker run --rm -v "$PWD":/src:ro retro80-gnustep
+#   docker run --rm -v "$PWD":/src:ro retro80-gnustep                        # сборка и быстрые тесты
+#   docker run --rm -v "$PWD":/src:ro retro80-gnustep build-retro80 -L long  # долгий 8080EXM
 #
 # Версии закреплены коммитами, на которых сборка проверена; обновлять осознанно.
 
